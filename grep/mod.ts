@@ -1,5 +1,4 @@
-import * as path from "https://deno.land/std/fs/path/mod.ts";
-import { green, red, bold } from "https://deno.land/std/colors/mod.ts";
+import { path, green, red, bold } from "./deps.ts";
 
 (async () => {
   if (Deno.args.length != 3) {
