@@ -18,14 +18,14 @@ const Home = ({ hint, guess, win, from }: HomeProps) => (
       hint !== "" && <div>Guess again! It's {hint} than {guess}</div>
     }
     {win
-      ? <div style={{ color: "red", fontSize: "16px" }}>You WIN! The number to guess was {guess}.</div>
+      ? <div style={{ color: "red" }}>You WIN! The number to guess was {guess}.</div>
       : <form action="guess" method="get">
         <input type="number" name="val" min="0" max="10" autoFocus/>
       </form>
     }
     <a href="/reset">Reset</a>
 
-    {from === "/reset" && !win && guess !== GuessSafeEnum.RESET && <div>You cannot reset until you win!</div>}
+    {from === "/reset" && !win && guess === GuessSafeEnum.RESET && <div>You cannot reset until you win!</div>}
   </div>
 );
 

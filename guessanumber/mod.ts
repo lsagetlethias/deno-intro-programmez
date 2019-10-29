@@ -4,7 +4,7 @@ import {
   Router,
   RouterContext
 } from "https://deno.land/x/oak/mod.ts";
-import { App, GuessSafeEnum, generate } from "./misc.ts";
+import { App, GuessSafeEnum, generate, log } from "./misc.ts";
 
 // État global de l'application
 const State = {
@@ -12,8 +12,8 @@ const State = {
   win: false,
   hint: "",
   from: "",
-  guess: -1,
-  redirect(ctx: RouterContext, to = "/") {
+  guess: GuessSafeEnum.NAN,
+  redirect(ctx: RouterContext, to = App.DEFAULT_ROUTE) {
     this.from = ctx.request.url;
     this.isRedirect = true;
     ctx.response.headers.set("Location", to);
@@ -35,7 +35,7 @@ let rand = {
 };
 
 // Début application
-console.log("guessanumber: Launch server");
+log("Launch server");
 
 // Configuration router
 const router = new Router();
@@ -45,11 +45,11 @@ router
     ctx.response.body = Home(State);
     State.endRedirect();
 
-    console.log(`guessanumber: Number to guess is ${rand.value}`);
+    log(`Number to guess is ${rand.value}`);
   })
   .get("/guess", ctx => {
     const guess = (State.guess = parseInt(ctx.request.searchParams.get("val")));
-    console.log(`guessanumber: ${guess} was suggested`);
+    log(`${guess} was suggested`);
 
     switch (true) {
       case guess > rand.value:
@@ -59,7 +59,9 @@ router
         State.hint = "more";
         break;
       case guess === rand.value:
+        State.hint = "";
         State.win = true;
+        break;
       default:
         State.hint = "";
         State.guess = GuessSafeEnum.NAN;
@@ -70,9 +72,9 @@ router
   .get("/reset", ctx => {
     if (State.win) {
       rand.reset();
-      State.guess = GuessSafeEnum.RESET;
       State.win = false;
-    }
+      State.guess = GuessSafeEnum.NAN;
+    } else State.guess = GuessSafeEnum.RESET;
 
     State.redirect(ctx);
   });
